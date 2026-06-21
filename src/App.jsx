@@ -1,39 +1,41 @@
 import { useState, useEffect } from "react";
 
 const C = { lavender:'#DFE5F3', cream:'#F2EFEA', navy:'#23303D', teal:'#395159', black:'#0D0D0D', white:'#FFFFFF' };
-const CC = { redox:'#395159', gut:'#4A6E52', hormone:'#6B5580', bone:'#7A6545', 'anti-inflammatory':'#4A7A9B', recovery:'#5E5E6E', peptide:'#1A2530', immune:'#7A5C50', nutrition:'#506A52' };
+const CC = { redox:'#395159', gut:'#4A6E52', hormone:'#6B5580', bone:'#7A6545', 'anti-inflammatory':'#4A7A9B', recovery:'#5E5E6E', peptide:'#1A2530', immune:'#7A5C50', nutrition:'#506A52', hydration:'#4A8FAA', detox:'#6A5A7A' };
 const DAYS = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
 const DFULL = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-const TL = { am:'☀️  Morning — Fasted', bk:'🍳  With Breakfast', md:'🌤  Midday', pm:'🌙  Evening', lf:'✓  Daily Commitments' };
+const TL = {
+  am:  '☀️  Wake — Empty Stomach',
+  bk:  '🌅  Mid-Morning with Breakfast',
+  md:  '🌤  Lunch',
+  pre: '💦  Pre-Sauna / Sweat Session',
+  pm:  '🌙  Dinner / Evening',
+  bed: '🌑  Before Bed',
+  lf:  '✓  Daily Commitments',
+};
 const B_THEMES = ['Foundation & Cellular Reset','Gut Healing & Hormone Balance','Mitochondrial Optimization','Peptide Prep — Final Integration'];
 const A_THEMES = ['Gut Reset & Bone Foundation','Microbiome Rebuild','Inflammation Reduction','Athletic Performance Foundation'];
 
 const it = (id,t,label,cat,note='') => ({id,t,label,cat,note});
 const xe = (label,detail,icon) => ({label,detail,icon});
 
-const getBItems = (wk) => [
-  it('am1','am','NAD+ / NMN 500mg','redox','Empty stomach'),
-  it('am2','am','Glutathione 500mg','redox','Empty stomach · 30 min fasted'),
-  it('am3','am','Berberine 500mg','gut','15–30 min before first meal'),
-  it('bk1','bk', wk>=3 ? 'Vitamin C 1500mg' : 'Vitamin C 1000mg','redox', wk===3 ? '★ Increase to 1500mg wk 3' : ''),
-  it('bk2','bk', wk>=3 ? 'Omega-3 EPA/DHA 3g' : wk===2 ? 'Omega-3 EPA/DHA 2–3g' : 'Omega-3 EPA/DHA 2g','anti-inflammatory', wk===2 ? '★ Increase dose wk 2' : ''),
-  it('bk3','bk','Vitamin D3 5000IU + K2 200mcg','hormone','With fat'),
-  it('bk4','bk','Zinc 25mg','immune','With food'),
-  it('bk5','bk','Methylated B Complex','hormone','Methyl B12 + Folate + B6'),
-  it('bk6','bk','Probiotic 50B CFU multi-strain','gut','30 min before or with breakfast'),
-  ...(wk>=2 ? [it('bk7','bk','L-Glutamine 5g','gut', wk===2 ? '★ ADD WK 2 — gut lining repair' : '')] : []),
-  ...(wk>=3 ? [it('bk8','bk','Alpha Lipoic Acid (ALA) 300mg','redox', wk===3 ? '★ ADD WK 3 — mitochondrial support' : '')] : []),
-  ...(wk>=4 ? [it('bk9','bk','Phosphatidylserine 200mg','hormone','★ ADD WK 4 — cortisol regulation + hormone balance')] : []),
-  it('md1','md','Digestive Enzymes','gut','With lunch'),
-  it('md2','md','CoQ10 / Ubiquinol 200mg','redox','With fat-containing meal'),
-  it('md3','md','Berberine 500mg (2nd dose)','gut'),
-  it('pm1','pm','Magnesium Glycinate 400mg','recovery','1–2 hrs before bed'),
-  it('pm2','pm','Ashwagandha KSM-66 300mg','hormone'),
-  it('pm3','pm','L-Theanine 200mg','recovery','With ashwagandha'),
-  it('pm4','pm','Sermorelin .1ml SubQ injection','peptide', wk===4 ? '5 nights/week — final week pre-peptide' : '5 of 7 nights · per Dr. protocol'),
+const getBItems = () => [
+  it('am1','am','L-Glutamine 5g','gut','Empty stomach upon waking'),
+  it('am2','am','Bovine Colostrum 1 scoop (~2.4g)','gut','Empty stomach upon waking'),
+  it('am3','am','Zinc Carnosine 37.5mg','gut','Empty stomach — 1st dose'),
+  it('bk1','bk','NAC 600mg','redox','With light breakfast'),
+  it('bk2','bk','Ubiquinol CoQ10 100mg','redox','With light breakfast'),
+  it('bk3','bk','PQQ 10mg','redox','With light breakfast'),
+  it('md1','md','Bioavailable Curcumin 1000mg','anti-inflammatory','With lunch'),
+  it('md2','md','High-EPA Omega-3 2000mg','anti-inflammatory','With lunch'),
+  it('pre1','pre','High-sodium electrolyte 1 serving','hydration','In 24 oz water · before sauna or sweat session'),
+  it('pm1','pm','Sulforaphane / Broccoli Seed Extract','redox','2 capsules ~30mg glucoraphanin · with dinner'),
+  it('pm2','pm','Zinc Carnosine 37.5mg','gut','2nd dose · with dinner'),
+  it('pm3','pm','Sermorelin .1ml SubQ injection','peptide','5 of 7 nights · per Dr. protocol'),
+  it('bed1','bed','Activated Charcoal 500mg','detox','2+ hours after all food and supplements'),
   it('lf1','lf','100g+ protein daily','nutrition','Prioritize at every meal'),
-  it('lf2','lf', wk===4 ? 'Anti-inflammatory whole foods only' : 'No processed sugar or seed oils','nutrition'),
-  it('lf3','lf','80–100 oz water','nutrition', wk>=3 ? 'Include electrolytes daily' : '+ electrolytes on training days'),
+  it('lf2','lf','No processed sugar or seed oils','nutrition'),
+  it('lf3','lf','80–100 oz water','nutrition','+ electrolytes on training days'),
   it('lf4','lf','7–9 hours sleep','recovery','Critical for Sermorelin efficacy'),
   it('lf5','lf','10–15 min AM sunlight','recovery','Circadian reset · cortisol optimization'),
 ];
@@ -123,13 +125,13 @@ export default function App() {
 
   useEffect(() => {
     try {
-      const s = localStorage.getItem('pm_v3');
+      const s = localStorage.getItem('pm_v4');
       if (s) setChk(JSON.parse(s));
     } catch(e) {}
   }, []);
 
   const persist = (nc) => {
-    try { localStorage.setItem('pm_v3', JSON.stringify(nc)); } catch(e) {}
+    try { localStorage.setItem('pm_v4', JSON.stringify(nc)); } catch(e) {}
   };
 
   const toggle = (id) => {
@@ -147,8 +149,8 @@ export default function App() {
   const isOn  = (id)  => !!chk[prof+'_w'+wk+'_d'+di+'_'+id];
   const isXOn = (idx) => !!chk[prof+'_w'+wk+'_x'+idx];
 
-  const items  = prof==='B' ? getBItems(wk) : getAItems(wk);
-  const exs    = prof==='B' ? getBEx(wk)    : getAEx(wk);
+  const items  = prof==='B' ? getBItems() : getAItems(wk);
+  const exs    = prof==='B' ? getBEx(wk)  : getAEx(wk);
   const themes = prof==='B' ? B_THEMES : A_THEMES;
 
   const grp = {};
@@ -165,6 +167,10 @@ export default function App() {
     display:'flex', alignItems:'center', justifyContent:'center',
     transition:'all 0.2s',
   });
+
+  const timeSlots = prof==='B'
+    ? ['am','bk','md','pre','pm','bed','lf']
+    : ['am','bk','md','pm','lf'];
 
   return (
     <div style={{minHeight:'100vh', background:C.cream, fontFamily:'"Trebuchet MS",Gill Sans,Calibri,system-ui,sans-serif', color:C.black, maxWidth:480, margin:'0 auto'}}>
@@ -263,10 +269,7 @@ export default function App() {
         {/* PROTOCOL TAB */}
         {tab==='proto' && (
           <div>
-            <div style={{background:C.lavender, borderRadius:9, padding:'8px 12px', marginBottom:10, fontSize:10, color:C.navy, lineHeight:1.5}}>
-              <strong>Verify</strong> — Built on Dr. Seeds Redox framework. Cross-reference your actual protocol documents and prescriber guidance before starting.
-            </div>
-            {['am','bk','md','pm','lf'].map(tk => {
+            {timeSlots.map(tk => {
               const ti = grp[tk] || [];
               if (!ti.length) return null;
               const allDone = ti.every(item => isOn(item.id));
@@ -389,7 +392,7 @@ export default function App() {
             <div style={{background:C.white, borderRadius:12, padding:'14px', marginBottom:10, boxShadow:'0 1px 3px rgba(0,0,0,0.06)'}}>
               <div style={{fontSize:9, fontWeight:700, letterSpacing:'0.13em', textTransform:'uppercase', color:C.teal, marginBottom:12}}>28-Day Journey</div>
               {[1,2,3,4].map(wNum => {
-                const wItems = prof==='B' ? getBItems(wNum) : getAItems(wNum);
+                const wItems = prof==='B' ? getBItems() : getAItems(wNum);
                 const wTotal = wItems.length * 7;
                 const wDone  = Object.keys(chk).filter(k => k.startsWith(prof+'_w'+wNum+'_d') && chk[k]).length;
                 const pct    = wTotal ? Math.round(wDone/wTotal*100) : 0;
@@ -410,7 +413,7 @@ export default function App() {
             <div style={{background:C.lavender, borderRadius:11, padding:'13px 15px', fontSize:11, lineHeight:1.65, color:C.navy}}>
               <div style={{fontWeight:700, marginBottom:4, fontSize:12, letterSpacing:'0.03em'}}>Coach Note</div>
               {prof==='B'
-                ? 'At 42 on Sermorelin, your sleep window IS the protocol. GH pulse peaks 90–120 min after sleep onset — every late night blunts that response. Lights out by 10–10:30pm is a non-negotiable performance variable. Your redox stack amplifies every adaptation you are building in the gym and on the road.'
+                ? 'At 42 on Sermorelin, your sleep window IS the protocol. GH pulse peaks 90–120 min after sleep onset — every late night blunts that response. Activated charcoal before bed only works if you give it the full 2+ hour buffer. Lights out by 10–10:30pm protects both.'
                 : 'Addie — your body is rebuilding from the inside out. Every day you eat enough and sleep fully, you are laying down new bone matrix. Composition follows function: fuel the athlete, train consistently, and leanness is a natural outcome. The goal is to be fast and strong, not just lighter. Trust the process.'
               }
             </div>
